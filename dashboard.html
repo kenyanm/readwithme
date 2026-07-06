@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your library — The Weekly Shelf</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="brand">The Weekly <em>Shelf</em></div>
+  <nav class="site-nav"></nav>
+</header>
+
+<div class="wrap">
+  <div class="eyebrow">Your library</div>
+  <h1 class="page-title">Read or download any book on the shelf.</h1>
+  <div id="statusBar" class="status-bar"></div>
+  <div id="shelf" class="shelf"></div>
+</div>
+
+<script src="assets/app.js"></script>
+<script>
+const session = requireLogin();
+
+async function load() {
+  const shelf = document.getElementById('shelf');
+  const statusBar = document.getElementById('statusBar');
+  shelf.innerHTML = '<p>Loading the shelf…</p>';
+
+  const res = await api('getBooks', { email: session.email });
+  if (!res.ok) { shelf.innerHTML = '<p class="msg error">Could not load books right now.</p>'; return; }
+
+  renderAccessStatus(statusBar, res.access);
+
+  if (!res.access.allowed) {
+    shelf.innerHTML = `<p>Your free trial or subscription has ended. <a href="payment.html">Pay 50 KES</a> to keep reading.</p>`;
+    return;
+  }
+
+  if (res.books.length === 0) {
+    shelf.innerHTML = '<p>No books yet — check back soon, new titles are added weekly.</p>';
+    return;
+  }
+
+  shelf.innerHTML = res.books.map(b => `
+    <div class="book">
+      <a href="reader.html?id=${encodeURIComponent(b.bookId)}">
+        <div class="cover" style="${b.coverImageUrl ? `background-image:url('${b.coverImageUrl}')` : ''}">
+          ${!b.coverImageUrl ? `<div class="cover-fallback">${b.title}</div>` : ''}
+        </div>
+      </a>
+      <div class="book-title">${b.title}</div>
+      <div class="book-author">${b.author || ''}</div>
+    </div>
+  `).join('');
+}
+if (session) load();
+</script>
+</body>
+</html>
