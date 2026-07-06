@@ -6,6 +6,7 @@ const API_URL = 'https://script.google.com/macros/s/AKfycby5g5EEn5giO41JGNiGrjq-
 const SUBSCRIPTION_PRICE = 50;
 const TILL_NUMBER = '6817863';
 
+
 async function api(action, payload) {
   const res = await fetch(API_URL, {
     method: 'POST',
