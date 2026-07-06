@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pay to keep reading — The Weekly Shelf</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="brand">The Weekly <em>Shelf</em></div>
+  <nav class="site-nav"></nav>
+</header>
+
+<div class="wrap">
+  <div class="eyebrow">50 KES / week</div>
+  <h1 class="page-title" style="font-size:32px;">Keep your shelf unlocked.</h1>
+
+  <div class="till-box">
+    <div class="label">Pay via M-Pesa · Buy Goods and Services</div>
+    <div class="num">Till Number: 6817863</div>
+  </div>
+
+  <ol style="max-width:480px; line-height:1.7;">
+    <li>Go to M-Pesa &rarr; Lipa na M-Pesa &rarr; Buy Goods and Services.</li>
+    <li>Till Number: <strong>6817863</strong>. Amount: <strong>50 KES</strong>.</li>
+    <li>Enter your M-Pesa PIN and confirm.</li>
+    <li>Copy the confirmation code from the SMS you receive (e.g. <em>QFT7XXXXXX</em>) and paste it below.</li>
+  </ol>
+
+  <div class="card">
+    <h2>Confirm your payment</h2>
+    <form id="payForm">
+      <label for="code">M-Pesa confirmation code</label>
+      <input id="code" type="text" required placeholder="e.g. QFT7A1B2C3">
+      <button type="submit">Submit for approval</button>
+    </form>
+    <div id="msg" class="msg"></div>
+    <p style="font-size:13px; color:var(--ink-soft); margin-top:16px;">
+      An admin checks the M-Pesa statement and approves your account, usually within a few hours.
+      Your library unlocks automatically once approved.
+    </p>
+  </div>
+</div>
+
+<script src="assets/app.js"></script>
+<script>
+const session = requireLogin();
+
+document.getElementById('payForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = e.target.querySelector('button');
+  const msg = document.getElementById('msg');
+  btn.disabled = true; msg.textContent = ''; msg.className = 'msg';
+
+  const mpesaCode = document.getElementById('code').value.trim();
+  const res = await api('submitPayment', { email: session.email, mpesaCode, amount: SUBSCRIPTION_PRICE });
+  btn.disabled = false;
+
+  if (!res.ok) {
+    msg.textContent = res.error;
+    msg.className = 'msg error';
+    return;
+  }
+  msg.textContent = res.message;
+  msg.className = 'msg ok';
+  e.target.reset();
+});
+</script>
+</body>
+</html>
