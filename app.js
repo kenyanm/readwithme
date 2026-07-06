@@ -2,7 +2,7 @@
 // CONFIGURE THIS: paste the Web app URL from your Apps Script deployment.
 // It must look like: https://script.google.com/macros/s/AKfycb.../exec
 // =====================================================================
-const API_URL = 'https://script.google.com/macros/s/AKfycbzPcFa5ZQzJDX4QXC1RavgcW7uO5vj4DvGAvD2GOCLwS48ochzT08GONczrlUskqORr/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbydodZhP2lcP3d8AU4fruAVDZZbGOuh-6NieJyp2Wo-1TfNmwhUmaH3397zgnUbaKP0/exec';
 
 const SUBSCRIPTION_PRICE = 50;
 const TILL_NUMBER = '6817863';
