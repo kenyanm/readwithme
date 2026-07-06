@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reading — The Weekly Shelf</title>
+<link rel="stylesheet" href="assets/style.css">
+<style>
+  .doc-frame { width: 100%; height: 80vh; border: 1px solid var(--line); border-radius: var(--radius); background: #fff; }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="brand">The Weekly <em>Shelf</em></div>
+  <nav class="site-nav"></nav>
+</header>
+
+<div class="wrap">
+  <p><a href="dashboard.html">&larr; Back to library</a></p>
+  <h1 class="page-title" id="bookTitle" style="font-size:30px;">Loading…</h1>
+  <p id="bookAuthor" class="lede"></p>
+  <div id="actions"></div>
+  <div id="frameWrap" style="margin-top:20px;"></div>
+  <div id="msg" class="msg"></div>
+</div>
+
+<script src="assets/app.js"></script>
+<script>
+const session = requireLogin();
+const bookId = new URLSearchParams(window.location.search).get('id');
+
+async function load() {
+  const msg = document.getElementById('msg');
+  if (!bookId) { msg.textContent = 'No book selected.'; msg.className = 'msg error'; return; }
+
+  const res = await api('getBook', { email: session.email, bookId });
+  if (!res.ok) {
+    msg.textContent = res.error;
+    msg.className = 'msg error';
+    if (res.access && !res.access.allowed) {
+      msg.innerHTML += ' <a href="payment.html">Pay to renew</a>';
+    }
+    return;
+  }
+
+  document.getElementById('bookTitle').textContent = res.book.title;
+  document.getElementById('bookAuthor').textContent = res.book.author || '';
+  document.getElementById('actions').innerHTML = `
+    <a class="button secondary" href="${res.book.downloadUrl}" target="_blank" rel="noopener">Download PDF</a>
+  `;
+  document.getElementById('frameWrap').innerHTML = `
+    <iframe class="doc-frame" src="${res.book.viewUrl}"></iframe>
+  `;
+}
+if (session) load();
+</script>
+</body>
+</html>
