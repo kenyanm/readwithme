@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign up — The Weekly Shelf</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="brand">The Weekly <em>Shelf</em></div>
+  <nav class="site-nav"></nav>
+</header>
+
+<div class="wrap">
+  <div class="card">
+    <h2>Start your free month</h2>
+    <p style="color:var(--ink-soft); font-size:14px;">No payment needed today. Your 30 days start the moment you sign up.</p>
+    <form id="regForm">
+      <label for="name">Full name</label>
+      <input id="name" type="text" required>
+      <label for="email">Email</label>
+      <input id="email" type="email" required>
+      <label for="password">Password</label>
+      <input id="password" type="password" minlength="6" required>
+      <button type="submit">Create account</button>
+    </form>
+    <div id="msg" class="msg"></div>
+    <p style="margin-top:20px; font-size:14px;">Already have an account? <a href="login.html">Log in</a></p>
+  </div>
+</div>
+
+<script src="assets/app.js"></script>
+<script>
+document.getElementById('regForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = e.target.querySelector('button');
+  const msg = document.getElementById('msg');
+  btn.disabled = true; msg.textContent = ''; msg.className = 'msg';
+
+  const name = document.getElementById('name').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value;
+
+  const res = await api('register', { name, email, password });
+  btn.disabled = false;
+
+  if (!res.ok) {
+    msg.textContent = res.error;
+    msg.className = 'msg error';
+    return;
+  }
+  saveSession(res.user);
+  window.location.href = 'dashboard.html';
+});
+</script>
+</body>
+</html>
