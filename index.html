@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Weekly Shelf — a new book every week</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="brand">The Weekly <em>Shelf</em></div>
+  <nav class="site-nav"></nav>
+</header>
+
+<div class="wrap">
+  <div class="eyebrow">New titles added every week</div>
+  <h1 class="page-title">Read this week's book. Then next week's.<br>First month is free.</h1>
+  <p class="lede">
+    Sign up and read everything on the shelf free for 30 days. After that it's
+    50 KES a week — less than a bus fare — for unlimited reading and downloads
+    of the whole growing catalogue.
+  </p>
+  <a class="button" href="register.html">Start reading free</a>
+  <a class="button secondary" href="login.html">I already have an account</a>
+
+  <div id="shelf" class="shelf" style="margin-top:50px;"></div>
+</div>
+
+<p class="footer-note">
+  Payments are made by M-Pesa Till Number <strong>6817863</strong> and confirmed
+  by an admin, usually within a few hours.
+</p>
+
+<script src="assets/app.js"></script>
+<script>
+async function loadShelf() {
+  const shelf = document.getElementById('shelf');
+  shelf.innerHTML = '<p>Loading the shelf…</p>';
+  const session = getSession();
+  const res = await api('getBooks', { email: session ? session.email : '' });
+  if (!res.ok) { shelf.innerHTML = '<p class="msg error">Could not load books right now.</p>'; return; }
+
+  if (res.books.length === 0) {
+    shelf.innerHTML = '<p>No books have been added yet — check back soon.</p>';
+    return;
+  }
+
+  const locked = !res.access.allowed;
+  shelf.innerHTML = res.books.map(b => `
+    <div class="book">
+      <a href="${locked ? 'register.html' : 'dashboard.html'}">
+        <div class="cover" style="${b.coverImageUrl ? `background-image:url('${b.coverImageUrl}')` : ''}">
+          ${!b.coverImageUrl ? `<div class="cover-fallback">${b.title}</div>` : ''}
+          ${locked ? '<div class="locked-badge">Sign up to read</div>' : ''}
+        </div>
+      </a>
+      <div class="book-title">${b.title}</div>
+      <div class="book-author">${b.author || ''}</div>
+    </div>
+  `).join('');
+}
+loadShelf();
+</script>
+</body>
+</html>
